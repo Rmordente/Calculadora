@@ -3,6 +3,7 @@ package com.rmordente.calculadoraGWT.client;
 import com.rmordente.calculadoraGWT.client.tipos.*;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutData;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer.HBoxLayoutAlign;
@@ -21,18 +22,18 @@ public class Vista extends ContentPanel implements SelectHandler
 	 */
 	public static final String INFO_TIPO_BOTON = "tipo";
 	
-	private TextField visor;
+	private TextField visor;	
 	
 	public Vista()
 	{
 		this.setHeading("Calculadora Básica");		
 
 		visor = new TextField();
-		visor.setWidth(170);
+		visor.setWidth(190);
 		visor.setReadOnly(true);
 		visor.setText("0");
 		
-		BoxLayoutData bld = new BoxLayoutData(new Margins(5));
+		BoxLayoutData bld = new BoxLayoutData(new Margins(5, 10, 5, 10));
 		
 		HBoxLayoutContainer hbl0 = new HBoxLayoutContainer();		
 		hbl0.setHBoxLayoutAlign(HBoxLayoutAlign.MIDDLE);		
@@ -68,7 +69,8 @@ public class Vista extends ContentPanel implements SelectHandler
 		hbl4.setHBoxLayoutAlign(HBoxLayoutAlign.MIDDLE);
 		hbl4.add(crearBoton("0", TipoBoton.DIGITO), bld);
 		hbl4.add(crearBoton(".", TipoBoton.PUNTO), bld);
-		hbl4.add(crearBoton("=", TipoBoton.IGUAL), new BoxLayoutData(new Margins(5, 5, 5, 125)));		
+		hbl4.add(crearBoton("Binario", TipoBoton.CONVERTIR_BINARIO, "120px"), bld);
+		hbl4.add(crearBoton("=", TipoBoton.IGUAL), bld);		
 		
 		VBoxLayoutContainer c = new VBoxLayoutContainer();
 		c.setVBoxLayoutAlign(VBoxLayoutAlign.CENTER);
@@ -80,14 +82,19 @@ public class Vista extends ContentPanel implements SelectHandler
 		c.add(hbl3, new BoxLayoutData(new Margins(0, 300, 0, 300)));
 		c.add(hbl4, new BoxLayoutData(new Margins(0, 300, 0, 300)));		
 		
-		this.add(c, new MarginData(100));
+		this.add(c, new MarginData(100));		
 	}
 	
 	private TextButton crearBoton(String etiqueta, TipoBoton tipo)
+	{		
+		return crearBoton(etiqueta, tipo, "50px");
+	}
+	
+	private TextButton crearBoton(String etiqueta, TipoBoton tipo, String width)
 	{
-		TextButton boton = new TextButton(etiqueta);
+		TextButton boton = new TextButton(etiqueta);		
 		
-		boton.setWidth("50px");		
+		boton.setWidth(width);		
 		boton.setData(INFO_TIPO_BOTON, tipo);		
 		boton.addSelectHandler(this);
 		
@@ -145,6 +152,23 @@ public class Vista extends ContentPanel implements SelectHandler
 			case PORCENTAJE:
 				controlador.procesarPorcentaje();
 				break;
+				
+			case CONVERTIR_BINARIO:
+				if (Validador.esEntero(this.visor.getText()))
+				{
+					this.setEnabled(false);
+					controlador.procesarConvertirABinario(Integer.parseInt(this.visor.getText()));
+				}
+				else
+					mostrarMensajeError("Debe introducir un número entero");
+				break;
 		}	    
 	}
+	
+	public void mostrarMensajeError(String texto)
+	{
+		MessageBox mensaje = new MessageBox("Error");				
+		mensaje.setMessage(texto);
+		mensaje.show();
+	}	
 }

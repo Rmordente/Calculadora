@@ -1,6 +1,11 @@
 package com.rmordente.calculadoraGWT.client;
 
+import java.util.Date;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.rmordente.calculadoraGWT.client.tipos.*;
+import com.rmordente.calculadoraGWT.shared.InfoConversion;
 
 public class Controlador
 {	
@@ -11,6 +16,7 @@ public class Controlador
 	private boolean nuevoNumero;
 	private Vista vista;
 	private Operador operador;
+	private OperacionesServiceAsync operacionesSvc; 
 	
 	private Controlador(Vista vista)
 	{
@@ -18,6 +24,7 @@ public class Controlador
 		this.ultimaOperacion = null;
 		this.nuevoNumero = false;		
 		this.vista = vista;
+		this.operacionesSvc = GWT.create(OperacionesService.class);
 		this.operador = Operador.getOperador();
 	}
 	
@@ -79,8 +86,8 @@ public class Controlador
 	}
 	
 	public void procesarSigno()
-	{
-		this.vista.setDatosVisor(String.valueOf(Double.parseDouble(this.vista.getDatosVisor()) * -1));		
+	{		
+		this.vista.setDatosVisor(String.valueOf(this.operador.multiplicar(Double.parseDouble(this.vista.getDatosVisor()), -1)));
 	}
 	
 	public void procesarPorcentaje()
@@ -88,6 +95,26 @@ public class Controlador
 		String resultado = String.valueOf(this.operador.porcentaje(this.acumulado, Double.parseDouble(this.vista.getDatosVisor())));
 		
 		this.vista.setDatosVisor(resultado);				
+	}	
+	
+	public void procesarConvertirABinario(int decimal)
+	{		
+		AsyncCallback<InfoConversion> callback = new AsyncCallback<InfoConversion>() {				
+			public void onFailure(Throwable caught) {			
+				vista.setEnabled(true);
+				vista.mostrarMensajeError(caught.getMessage());
+			}
+
+			public void onSuccess(InfoConversion result) {
+				vista.setEnabled(true);
+				vista.setDatosVisor(result.getResultado());				
+				
+				if (result.getErrorGrabacion() != "")
+					vista.mostrarMensajeError(result.getErrorGrabacion());
+			}
+		};		
+		
+		this.operacionesSvc.convertirABinario(decimal, new Date(), callback);
 	}
 	
 	public void procesarOperador(TipoBoton tipo)

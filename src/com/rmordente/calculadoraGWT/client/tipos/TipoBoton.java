@@ -11,5 +11,6 @@ public enum TipoBoton {
 	SIGNO,
 	IGUAL,
 	CLEAR_C, 
-	CLEAR_CE
+	CLEAR_CE,
+	CONVERTIR_BINARIO
 }
