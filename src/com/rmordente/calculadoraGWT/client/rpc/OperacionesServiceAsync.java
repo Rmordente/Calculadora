@@ -1,4 +1,4 @@
-package com.rmordente.calculadoraGWT.client;
+package com.rmordente.calculadoraGWT.client.rpc;
 
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

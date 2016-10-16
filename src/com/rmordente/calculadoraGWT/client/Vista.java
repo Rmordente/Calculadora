@@ -3,6 +3,7 @@ package com.rmordente.calculadoraGWT.client;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.rmordente.calculadoraGWT.client.tipos.*;
+import com.rmordente.calculadoraGWT.client.utils.Validador;
 import com.rmordente.calculadoraGWT.shared.InfoConversion;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.ContentPanel;

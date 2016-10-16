@@ -1,4 +1,4 @@
-package com.rmordente.calculadoraGWT.client;
+package com.rmordente.calculadoraGWT.client.utils;
 
 /**
  * Clase para hacer validaciones

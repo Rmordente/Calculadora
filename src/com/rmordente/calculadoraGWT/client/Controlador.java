@@ -2,6 +2,8 @@ package com.rmordente.calculadoraGWT.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.rmordente.calculadoraGWT.client.rpc.OperacionesService;
+import com.rmordente.calculadoraGWT.client.rpc.OperacionesServiceAsync;
 import com.rmordente.calculadoraGWT.client.tipos.*;
 import com.rmordente.calculadoraGWT.shared.InfoConversion;
 

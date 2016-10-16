@@ -1,6 +1,6 @@
 package com.rmordente.calculadoraGWT.server;
 
-import com.rmordente.calculadoraGWT.client.OperacionesService;
+import com.rmordente.calculadoraGWT.client.rpc.OperacionesService;
 import com.rmordente.calculadoraGWT.shared.*;
 import java.util.Date;
 import java.util.List;
