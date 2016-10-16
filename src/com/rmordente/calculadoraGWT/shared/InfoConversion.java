@@ -29,11 +29,13 @@ public class InfoConversion implements Serializable{
   {    
   }
   
-  public InfoConversion(int numero, String resultado, Date fecha) {    
-    this.numero = numero;
-    this.resultado = resultado;
-	this.fechaSolicitud = fecha;
-	this.errorGrabacion = "";
+  public InfoConversion(int numero, String resultado, Date fecha)
+  {
+	  this();
+	  this.numero = numero;
+	  this.resultado = resultado;
+	  this.fechaSolicitud = fecha;
+	  this.errorGrabacion = "";
   }
 
   public Long getId() {
@@ -67,4 +69,9 @@ public class InfoConversion implements Serializable{
   public void setErrorGrabacion(String error) {
 	  this.errorGrabacion = error;
   }
+  
+  public void setFechaSolicitud(Date fecha) {
+	  this.fechaSolicitud = fecha;
+  }
+  
 }

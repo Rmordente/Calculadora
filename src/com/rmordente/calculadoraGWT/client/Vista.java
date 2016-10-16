@@ -1,13 +1,17 @@
 package com.rmordente.calculadoraGWT.client;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.rmordente.calculadoraGWT.client.tipos.*;
+import com.rmordente.calculadoraGWT.shared.InfoConversion;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutData;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer.HBoxLayoutAlign;
-import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer.VBoxLayoutAlign;
@@ -23,6 +27,7 @@ public class Vista extends ContentPanel implements SelectHandler
 	public static final String INFO_TIPO_BOTON = "tipo";
 	
 	private TextField visor;	
+	private AutoProgressMessageBox progreso;
 	
 	public Vista()
 	{
@@ -73,16 +78,20 @@ public class Vista extends ContentPanel implements SelectHandler
 		hbl4.add(crearBoton("=", TipoBoton.IGUAL), bld);		
 		
 		VBoxLayoutContainer c = new VBoxLayoutContainer();
-		c.setVBoxLayoutAlign(VBoxLayoutAlign.CENTER);
-		c.setBorders(true);		
+		c.setVBoxLayoutAlign(VBoxLayoutAlign.CENTER);				
 		
 		c.add(hbl0);
-		c.add(hbl1, new BoxLayoutData(new Margins(0, 300, 0, 300)));
-		c.add(hbl2, new BoxLayoutData(new Margins(0, 300, 0, 300)));
-		c.add(hbl3, new BoxLayoutData(new Margins(0, 300, 0, 300)));
-		c.add(hbl4, new BoxLayoutData(new Margins(0, 300, 0, 300)));		
+		c.add(hbl1);
+		c.add(hbl2);
+		c.add(hbl3);
+		c.add(hbl4);		
 		
-		this.add(c, new MarginData(100));		
+		//listar resultados		
+		c.add(crearBoton("Ver resultados", TipoBoton.LISTAR_RESULTADOS, "190px"), new BoxLayoutData(new Margins(30)));
+		
+		progreso = new AutoProgressMessageBox("");		
+		
+		this.add(c, new BoxLayoutData(new Margins(30)));
 	}
 	
 	private TextButton crearBoton(String etiqueta, TipoBoton tipo)
@@ -156,19 +165,74 @@ public class Vista extends ContentPanel implements SelectHandler
 			case CONVERTIR_BINARIO:
 				if (Validador.esEntero(this.visor.getText()))
 				{
-					this.setEnabled(false);
+					this.mostrarProgreso("Calculando operación...");
 					controlador.procesarConvertirABinario(Integer.parseInt(this.visor.getText()));
 				}
 				else
-					mostrarMensajeError("Debe introducir un número entero");
+					this.mostrarMensaje("Debe introducir un número entero", "Error");
+				break;
+			case LISTAR_RESULTADOS:
+				this.mostrarProgreso("Cargando datos...");
+				controlador.obtenerConversionesRealizadas();
 				break;
 		}	    
 	}
 	
-	public void mostrarMensajeError(String texto)
+	public void mostrarMensaje(String texto, String titulo)
 	{
-		MessageBox mensaje = new MessageBox("Error");				
+		MessageBox mensaje = new MessageBox(titulo);				
 		mensaje.setMessage(texto);
 		mensaje.show();
-	}	
+	}
+	
+	public void mostrarProgreso(String mensaje)
+	{				
+		progreso.setProgressText(mensaje);	
+		progreso.auto();
+		progreso.show();
+	}
+	
+	public void ocultarProgreso()
+	{
+		progreso.hide();
+	}
+	
+	public void mostrarConversiones(InfoConversion[] lista)
+	{
+		Dialog cuadroDialogo = new Dialog();
+		
+		DateTimeFormat formato = DateTimeFormat.getFormat("dd/MM/yyyy HH:mm:ss");
+		
+		FlexTable tabla = new FlexTable();		
+		
+		tabla.setText(0, 0, "Decimal");
+		tabla.setText(0, 1, "Binario");
+		tabla.setText(0, 2, "Fecha y hora");
+		
+		tabla.addStyleName("tabla");
+		tabla.getRowFormatter().addStyleName(0, "cabecera");		
+		
+		for (int i = 0; i < lista.length; i++) {
+			InfoConversion info = lista[i];
+			
+			tabla.setText(i+1, 0, String.valueOf(info.getNumero()));
+			tabla.setText(i+1, 1, info.getResultado());
+			tabla.setText(i+1, 2, formato.format(info.getFechaSolicitud()));
+			
+			tabla.getCellFormatter().addStyleName(i+1, 0, "columnaNumerica");
+			tabla.getCellFormatter().addStyleName(i+1, 1, "columnaNumerica");
+			tabla.getCellFormatter().addStyleName(i+1, 2, "columnaFecha");
+			
+			if (i%2 != 0)
+				tabla.getRowFormatter().addStyleName(i+1, "filaSombreada");
+		}
+       
+		cuadroDialogo.setHeading("Conversiones a binario realizadas");
+		cuadroDialogo.setPixelSize(450, -1);		  		  
+		cuadroDialogo.setResizable(true);		
+		cuadroDialogo.setBodyBorder(false);
+		cuadroDialogo.setHideOnButtonClick(true);
+		cuadroDialogo.add(tabla);
+		cuadroDialogo.show();
+	}
 }

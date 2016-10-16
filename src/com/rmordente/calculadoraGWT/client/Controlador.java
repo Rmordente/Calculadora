@@ -1,7 +1,5 @@
 package com.rmordente.calculadoraGWT.client;
 
-import java.util.Date;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.rmordente.calculadoraGWT.client.tipos.*;
@@ -97,26 +95,6 @@ public class Controlador
 		this.vista.setDatosVisor(resultado);				
 	}	
 	
-	public void procesarConvertirABinario(int decimal)
-	{		
-		AsyncCallback<InfoConversion> callback = new AsyncCallback<InfoConversion>() {				
-			public void onFailure(Throwable caught) {			
-				vista.setEnabled(true);
-				vista.mostrarMensajeError(caught.getMessage());
-			}
-
-			public void onSuccess(InfoConversion result) {
-				vista.setEnabled(true);
-				vista.setDatosVisor(result.getResultado());				
-				
-				if (result.getErrorGrabacion() != "")
-					vista.mostrarMensajeError(result.getErrorGrabacion());
-			}
-		};		
-		
-		this.operacionesSvc.convertirABinario(decimal, new Date(), callback);
-	}
-	
 	public void procesarOperador(TipoBoton tipo)
 	{
 		double numero = Double.parseDouble(this.vista.getDatosVisor());		
@@ -153,5 +131,46 @@ public class Controlador
 			this.vista.setDatosVisor(String.valueOf(this.acumulado));
 			this.ultimaOperacion = tipo;			
 		}
+	}
+	
+	/*
+	 * Operaciones asíncronas
+	 */
+	
+	public void procesarConvertirABinario(int decimal)
+	{		
+		AsyncCallback<InfoConversion> callback = new AsyncCallback<InfoConversion>() {				
+			public void onFailure(Throwable caught) {			
+				vista.ocultarProgreso();
+				vista.mostrarMensaje(caught.getMessage(), "Error");
+			}
+
+			public void onSuccess(InfoConversion result) {
+				vista.ocultarProgreso();
+				vista.setDatosVisor(result.getResultado());				
+				
+				if (result.getErrorGrabacion() != "")
+					vista.mostrarMensaje(result.getErrorGrabacion(), "Error");
+			}
+		};		
+		
+		this.operacionesSvc.convertirABinario(decimal, callback);
+	}
+	
+	public void obtenerConversionesRealizadas()
+	{
+		AsyncCallback<InfoConversion[]> callback = new AsyncCallback<InfoConversion[]>() {				
+			public void onFailure(Throwable caught) {			
+				vista.ocultarProgreso();
+				vista.mostrarMensaje(caught.getMessage(), "Error");
+			}
+
+			public void onSuccess(InfoConversion[] result) {				
+				vista.ocultarProgreso();
+				vista.mostrarConversiones(result);
+			}
+		};	
+		
+		this.operacionesSvc.obtenerConversiones(callback);
 	}
 }

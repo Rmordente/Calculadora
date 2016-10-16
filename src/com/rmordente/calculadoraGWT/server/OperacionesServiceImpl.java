@@ -2,48 +2,63 @@ package com.rmordente.calculadoraGWT.server;
 
 import com.rmordente.calculadoraGWT.client.OperacionesService;
 import com.rmordente.calculadoraGWT.shared.*;
-
 import java.util.Date;
-
+import java.util.List;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Query;
+
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
 public class OperacionesServiceImpl extends RemoteServiceServlet implements OperacionesService {
 
-	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");	
 	
-	/**
-	 * Convierte un entero de base decimal a binario
-	 * 
-	 * @param numero: número en base decimal a convertir
-	 * @param fechaSolicitud: fecha y hora en la que se hace la solicitud
-	 * @return Objeto InfoConversion con el resultado. Si ha habido error al grabar en BD se guarda un mensaje de error.  
-	 */
-    public InfoConversion convertirABinario(int numero, Date fechaSolicitud)
+    public InfoConversion convertirABinario(int numero)
 	{    	
-    	InfoConversion info = new InfoConversion(numero, Integer.toBinaryString(numero), fechaSolicitud);
+    	InfoConversion info = new InfoConversion(numero, Integer.toBinaryString(numero), new Date());
     	
-    	if (!grabarConversionBinario(numero, info.getResultado(), fechaSolicitud))
+    	if (!grabarConversionBinario(numero, info.getResultado(), info.getFechaSolicitud()))
     		info.setErrorGrabacion("No se ha podido grabar el resultado de la conversión");    		
     		
     	return info;
     }
-	
+    
+    @SuppressWarnings("unchecked")
+	public InfoConversion[] obtenerConversiones()
+    {
+    	PersistenceManager pm = PMF.getPersistenceManager();
+        List<InfoConversion> conversiones = null;
+        
+        try 
+        {
+        	Query q = pm.newQuery(InfoConversion.class);
+        	q.setOrdering("fechaSolicitud desc");        	
+        	
+        	conversiones = (List<InfoConversion>) q.execute(); 
+        	conversiones = (List<InfoConversion>) pm.detachCopyAll(conversiones);        	
+        }        
+        finally {        	
+        	if (pm != null)
+        		pm.close();
+        }        
+
+        return conversiones.toArray(new InfoConversion[conversiones.size()]);
+    }
+    
     /**
-     * Graba la información de conversión en BD
+     * Graba la información de conversión en base de datos
      * 
-     * @param decimal: número en base decimal 
-     * @param binario: número en binario
-     * @param fecha: fecha y hora en la que se hace la solicitud de conversion
+     * @param decimal número en base decimal 
+     * @param binario número en binario
+     * @param fecha fecha y hora en la que se hace la solicitud de conversión
      * @return Devuelve true si ha conseguido grabar la información y false en caso contrario
      */
 	private boolean grabarConversionBinario(int decimal, String binario, Date fecha)
 	{
-		//graba en BD la informacion: si puede grabar devuelve true sino false		
 		PersistenceManager pm = PMF.getPersistenceManager();
 		boolean grabado = true;
 		

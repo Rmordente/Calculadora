@@ -8,8 +8,8 @@ package com.rmordente.calculadoraGWT.client;
 public class Validador 
 {
 	/**
-	 * Comprueba si un numero es entero
-	 * @param numero
+	 * Comprueba si un número es entero
+	 * @param numero número a comprobar
 	 * @return true si es entero, false si no lo es
 	 */
 	public static boolean esEntero(String numero)

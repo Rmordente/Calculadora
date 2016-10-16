@@ -1,2 +1,28 @@
 /** Add css rules here for your application. */
 
+.tabla {
+	width: 430px;	
+	border: 1px solid silver;
+  	padding: 5px;
+  	margin: 5px;
+}
+
+.cabecera {
+	background-color: #2062B8;
+	color: white;
+	text-align: center;
+	font-style: normal;
+	font-weight: bold;   
+}
+
+.columnaNumerica {
+	text-align: right;  
+}
+
+.columnaFecha {
+	text-align: center; 
+}
+
+.filaSombreada {
+	background-color: #E9E5E5;
+}
